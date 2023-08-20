@@ -12,7 +12,7 @@ export const POST = async (request: Request): Promise<Response> => {
   if (!validatedRequest.success) return formJsonHttpResponse(createValidationError(), 422)
   const { data } = validatedRequest
 
-  await prisma.post.create({
+  const post = await prisma.post.create({
     data: {
       title: data.title,
       description: data.description,
@@ -21,7 +21,9 @@ export const POST = async (request: Request): Promise<Response> => {
     },
   })
 
-  return formJsonHttpResponse(validatedRequest)
+  // Return created resource in JSON API format
+  const { id, ...rest } = post
+  return formJsonHttpResponse({ id: post.id, type: 'post', attributes: rest })
 }
 
 const createValidationError = () => ({
