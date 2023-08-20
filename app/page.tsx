@@ -41,14 +41,22 @@ const parseSerializedFile = (serializedFile: string): ImageData => {
 }
 
 export default function Page() {
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false)
   const [images, setImages] = useState([] as ImageData[])
 
   const handleGenerateClick = async () => {
-    const dogNumber = Math.ceil(5 * Math.random())
-    const response = await fetch(`/images/dog-${dogNumber.toString().padStart(2, '0')}.jpg`)
-    const serialzedFile = await serializeFileData(await response.blob())
-    const imageData = parseSerializedFile(serialzedFile)
-    setImages([...images, imageData])
+    if (isGeneratingImage) return
+
+    try {
+      setIsGeneratingImage(true)
+      const dogNumber = Math.ceil(5 * Math.random())
+      const response = await fetch(`/images/dog-${dogNumber.toString().padStart(2, '0')}.jpg`)
+      const serialzedFile = await serializeFileData(await response.blob())
+      const imageData = parseSerializedFile(serialzedFile)
+      setImages([...images, imageData])
+    } finally {
+      setIsGeneratingImage(false)
+    }
   }
 
   return (
