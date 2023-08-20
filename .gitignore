@@ -8,6 +8,9 @@
 /.next/
 /out/
 
+# prisma
+prisma/dev.db*
+
 # production
 /build
 
