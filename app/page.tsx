@@ -1,9 +1,9 @@
 'use client'
 
-import { Images } from '@/components/Images'
+import { ImageData, Images } from '@/components/Images'
 import { ReadStream } from 'fs'
 import dynamic from 'next/dynamic'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 
 const Blob = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Blob), { ssr: false })
 const Dog = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Dog), { ssr: false })
@@ -34,7 +34,7 @@ const serializeFileData = async (blob: Blob): Promise<string> =>
     reader.onerror = () => reject(new Error('An unexpected error occured generating the file'))
   })
 
-const parseSerializedFile = (serializedFile: string): { dataType: string; encodedData: string } => {
+const parseSerializedFile = (serializedFile: string): ImageData => {
   const [dataTypeSegment, encodedDataSegment] = serializedFile.split(';')
   const dataType = dataTypeSegment.split(':')[1]
   const encodedData = encodedDataSegment.split('base64,')[1]
@@ -42,11 +42,14 @@ const parseSerializedFile = (serializedFile: string): { dataType: string; encode
 }
 
 export default function Page() {
+  const [images, setImages] = useState([] as ImageData[])
+
   const handleGenerateClick = async () => {
     const dogNumber = Math.ceil(5 * Math.random())
     const response = await fetch(`/images/dog-${dogNumber.toString().padStart(2, '0')}.jpg`)
     const serialzedFile = await serializeFileData(await response.blob())
-    console.log(parseSerializedFile(serialzedFile))
+    const imageData = parseSerializedFile(serialzedFile)
+    setImages([...images, imageData])
   }
 
   return (
@@ -92,7 +95,7 @@ export default function Page() {
       <div className='bg-gray-100 p-8'>
         <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row lg:w-4/5'>
           <div className='mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4 lg:w-4/5'>
-            <Images imageData={[]}></Images>
+            <Images imageData={images}></Images>
           </div>
         </div>
       </div>
