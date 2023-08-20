@@ -9,8 +9,12 @@
   "engines": {
     "node": ">=14"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "dependencies": {
     "@ducanh2912/next-pwa": "^9.0.1",
+    "@prisma/client": "5.1.1",
     "@react-three/drei": "^9.77.3",
     "@react-three/fiber": "^8.13.3",
     "glsl-random": "^0.0.5",
@@ -19,11 +23,11 @@
     "react-dom": "^18.2.0",
     "three": "^0.153.0",
     "three-stdlib": "^2.23.10",
-    "tunnel-rat": "^0.1.2"
+    "tunnel-rat": "^0.1.2",
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^13.3.0",
-    "@prisma/client": "5.1.1",
     "@types/node": "^20.4.5",
     "@types/react": "^18.2.18",
     "autoprefixer": "^10.4.14",
