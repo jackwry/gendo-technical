@@ -14,4 +14,22 @@ model User {
   id                  String          @id @default(cuid())
   name                String?
   email               String?         @unique
+  posts               Post[]
+}
+
+model Post {
+  id                  String          @id @default(cuid())
+  userId              String
+  user                User          @relation(fields: [userId], references: [id])
+  title               String
+  description         String
+  fileId              String
+  file                File          @relation(fields: [fileId], references: [id])
+}
+
+model File {
+  id                  String          @id @default(cuid())
+  dataType            String
+  encodedDataBase64   String
+  posts               Post[]
 }
