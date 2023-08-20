@@ -1,6 +1,7 @@
 'use client'
 
-import { ImageData, Images } from '@/components/Images'
+import Images from '@/components/Images'
+import { ImageData } from '@/components/Image'
 import dynamic from 'next/dynamic'
 import { Suspense, useState } from 'react'
 

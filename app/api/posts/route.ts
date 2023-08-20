@@ -1,11 +1,21 @@
 import { formJsonHttpResponse } from '@/http'
 import { validatePostRequest } from './validatePostRequest'
 import { PrismaClient } from '@prisma/client'
+import { formatPostAsJsonApiResponse } from '@/ApiModels/PostJsonApiData'
 
 const prisma = new PrismaClient()
 const defaultUser = 'alice@prisma.io'
 
+export const GET = async (): Promise<Response> => {
+  // TODO Get user email or ID from auth token
+  const posts = await prisma.post.findMany({ where: { user: { email: defaultUser } }, include: { file: true } })
+
+  const jsonApiPosts = posts.map((post) => formatPostAsJsonApiResponse(post, post.file))
+  return formJsonHttpResponse({ data: jsonApiPosts }, 200)
+}
+
 export const POST = async (request: Request): Promise<Response> => {
+  // TODO Get user email or ID from auth token
   const jsonPayload = await request.json()
   const validatedRequest = validatePostRequest(jsonPayload)
 
@@ -19,11 +29,11 @@ export const POST = async (request: Request): Promise<Response> => {
       user: { connect: { email: defaultUser } },
       file: { create: { dataType: data.fileDataType, encodedDataBase64: data.fileEncodedData } },
     },
+    include: { file: true },
   })
 
-  // Return created resource in JSON API format
-  const { id, ...rest } = post
-  return formJsonHttpResponse({ id: post.id, type: 'post', attributes: rest })
+  const jsonApiPost = formatPostAsJsonApiResponse(post, post.file)
+  return formJsonHttpResponse({ data: jsonApiPost }, 201)
 }
 
 const createValidationError = () => ({
