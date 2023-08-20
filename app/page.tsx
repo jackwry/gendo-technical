@@ -1,5 +1,7 @@
 'use client'
 
+import { Images } from '@/components/Images'
+import { ReadStream } from 'fs'
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
 
@@ -24,7 +26,29 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
+const serializeFileData = async (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(blob)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(new Error('An unexpected error occured generating the file'))
+  })
+
+const parseSerializedFile = (serializedFile: string): { dataType: string; encodedData: string } => {
+  const [dataTypeSegment, encodedDataSegment] = serializedFile.split(';')
+  const dataType = dataTypeSegment.split(':')[1]
+  const encodedData = encodedDataSegment.split('base64,')[1]
+  return { dataType, encodedData }
+}
+
 export default function Page() {
+  const handleGenerateClick = async () => {
+    const dogNumber = Math.ceil(5 * Math.random())
+    const response = await fetch(`/images/dog-${dogNumber.toString().padStart(2, '0')}.jpg`)
+    const serialzedFile = await serializeFileData(await response.blob())
+    console.log(parseSerializedFile(serialzedFile))
+  }
+
   return (
     <>
       <div className='bg-gray-100'>
@@ -57,7 +81,10 @@ export default function Page() {
           <p className='mb-8 text-gray-600'>
             Drag, scroll, pinch, and rotate the canvas to frame your image, and then when you're happy, hit generate.
           </p>
-          <div className='border border-blue-400 w-fit p-2 rounded-md hover:cursor-pointer hover:bg-blue-50 text-blue-500'>
+          <div
+            className='border border-blue-400 w-fit p-2 rounded-md hover:cursor-pointer hover:bg-blue-50 text-blue-500'
+            onClick={handleGenerateClick}
+          >
             Generate
           </div>
         </div>
@@ -65,14 +92,7 @@ export default function Page() {
       <div className='bg-gray-100 p-8'>
         <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row lg:w-4/5'>
           <div className='mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4 lg:w-4/5'>
-            {(() => {
-              // TODO!
-              const images = []
-              for (let i = 0; i < 12; i++) {
-                images.push(<div className='w-32 h-32 bg-white rounded-md'></div>)
-              }
-              return images
-            })()}
+            <Images imageData={[]}></Images>
           </div>
         </div>
       </div>
