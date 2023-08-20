@@ -27,7 +27,11 @@ const Image: React.FC<Partial<ImageData>> = (props) => {
   return (
     <div className='flex w-32 h-32 bg-white rounded-md justify-center items-center'>
       {hasImage && (
-        <img onClick={onClick} src={`data:${props.dataType};base64,${props.encodedData}`} className='w-5/6 h-5/6'></img>
+        <img
+          onClick={onClick}
+          src={`data:${props.dataType};base64,${props.encodedData}`}
+          className='w-5/6 h-5/6 hover:cursor-pointer'
+        ></img>
       )}
     </div>
   )
