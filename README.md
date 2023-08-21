@@ -41,3 +41,5 @@ reference the same image.
 - Separate endpoint for file retrieval to improve responsiveness and reduce
   request times
 - Authentication and users
+- Improved browser interactions including loading spinners and textual inputs
+  for the creation of posts. These were initially omitted due to time pressures
